@@ -1,79 +1,86 @@
-<template>
-    <div id="step1">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-sm-12">
-                    <div class="text-center">
-                        <h1>คำนวณจำนวนเสียงต่อ ส.ส. พึงมี 1 คน</h1>
-                        <span class="font-italic">รัฐธรรมนูญ มาตรา 91 วรรค 1</span>
-                        <p>
-                            รวมนับคะแนนทั้งประเทศ <span class="total-vote-count-number">0</span> เสียง
-                        </p>
-                        <p class="divide" style="opacity: 0;">
-                            ------------------------------------
-                        </p>
-                        <p class="divide2" style="opacity: 0;">
-                            หารจำนวน ส.ส. ทั้งหมด 500 คน
-                        </p>
-                        <p class="divide3" style="opacity: 0;">=</p>
-                        <h1>
-                            <span class="total-vote-per-ss" style="opacity: 0;">0</span>
-                        </h1>
-                        <div>
-                            <button class="btn btn-secondary" @click="start" style="opacity: 0">
-                                เล่นซ้ำ
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<template lang="pug">
+    div#step3
+        div.container-fluid
+            div.row
+                div.col-sm-12
+                    div.text-center
+                        h1 ขั้นที่ 3 คำนวณ ส.ส. บัญชีรายชื่อเบื้องต้น
+                        span.font-italic รัฐธรรมนูญ มาตรา 91 วรรค 3,4
+                        p จำนวน ส.ส. พึงมี - จำนวน ส.ส. เขต
+                        p.divide.hide เท่ากับ
+            div.row.justify-content-md-center
+                div.col-sm-8
+                        table.ss-table.table.table-dark.table-sm
+                            thead
+                                tr
+                                    th พรรค
+                                    th ส.ส. พึงมี
+                                    th ส.ส. เขต
+                                    th ส.ส. บัญชีรายชื่อเบื้องต้น
+                                    th
+                            tr(v-for="party in sortedByScore", v-bind:key="party.party")
+                                td.party {{ party.party }}
+                                td.number.ss_allowed(:data-value="party.ss_allowed") {{ party.ss_allowed }}
+                                td.number.ss_zone(:data-value="party.ss_zone") {{ party.ss_zone }}
+                                td.number.ss_party_list_1(:data-value="party.ss_party_list_1") {{ party.ss_party_list_1 }}
+                                td
+                                    span.seat.hide(v-for="i in floor(party.ss_party_list_1)", v-bind:key="i")
+                                        Seat(ref="seats",
+                                            width="4",
+                                            height="4",
+                                            style="fill: #ffffff")
+                        div
+                            Redo.hide(:click="start")
 </template>
 
 <script>
-  // import _ from 'lodash'
-  // import Seat from './Seat'
-  // import jQuery from 'jquery'
-  // const $ = jQuery
+  import _ from 'lodash'
+  import Redo from './Redo'
+  import rawPartyScore from './../party_score_100'
+  import jQuery from 'jquery'
+  import Seat from './Seat'
 
   export default {
     name: 'Step3',
     props: {},
     components: {
-      // Seat
+      Seat,
+      Redo
+    },
+    filters: {
+      toNumber (value) {
+        return parseInt(value).toLocaleString()
+      }
     },
     data: function () {
       return {
-        seats: [],
         timeline1: null,
         seatFormation: {
           row: 5,
           column: 30
-        }
+        },
+        partyScore: {}
+      }
+    },
+    computed: {
+      sortedByScore () {
+        // return _.sortBy(this.partyScore, 'score')
+        return _.orderBy(this.partyScore, 'score', 'desc')
       }
     },
     created () {
-      for (let i = 0; i < 500; i++) {
-        this.seats.push({
-          id: i,
-          ssType: (i % 100) - 70 >= 0 ? 'ss-party' : 'ss-zone'
-        })
-      }
+      _.each(rawPartyScore, (v) => {
+        this.partyScore[v.party] = v
+      })
     },
+
     mounted () {
-      // let self = this
+      // let that = this
       this.timeline1 = this
         .$anime
         .timeline({ autoplay: true })
         .add({
-          targets: '.total-vote-count-number',
-          color: '#56FF79',
-          innerHTML: ['0', '35528749'],
-          round: 1
-        })
-        .add({
-          targets: '.divide',
+          targets: '#step3 .divide',
           opacity: {
             value: 1,
             duration: 1000,
@@ -81,39 +88,50 @@
           }
         })
         .add({
-          targets: '.divide2',
-          opacity: {
-            value: 1,
-            duration: 1000,
-            easing: 'easeInOutQuad',
-          }
+          targets: '#step3 .ss-table tr td.ss_allowed',
+          innerHTML: (e) => {
+            let value = jQuery(e).data('value')
+            return [0, value]
+          },
+          round: 10000,
+          delay: 500
         })
         .add({
-          targets: '.divide3',
-          opacity: {
-            value: 1,
-            duration: 1000,
-            easing: 'easeInOutQuad',
-          }
-        })
-        .add({
-          targets: '.total-vote-per-ss',
-          opacity: {
-            value: 1,
-            duration: 1000,
-            easing: 'easeInOutQuad',
-          }
-        })
-        .add({
-          targets: '.total-vote-per-ss',
-          color: '#56FF79',
-          innerHTML: ['0', '71057'],
+          targets: '#step3 .ss-table tr td.ss_zone',
+          innerHTML: (e) => {
+            let value = jQuery(e).data('value')
+            return [0, value]
+          },
           round: 1,
+          delay: 500
+        })
+        .add({
+          targets: '#step3 .ss-table tr td.ss_party_list_1',
+          innerHTML: (e) => {
+            let value = jQuery(e).data('value')
+            return [0, value]
+          },
+          round: 10000,
+          delay: 500
+        })
+        .add({
+          targets: '#step3 .seat',
+          opacity: 1,
+          easing: 'easeOutExpo',
+          // delay: 1000
+          delay: this.$anime.stagger(5)
+        })
+        .add({
+          targets: '#step3 .btn',
+          opacity: 1
         })
     },
     methods: {
       start () {
         this.timeline1.restart()
+      },
+      floor (v) {
+        return Math.floor(v)
       }
     }
   }
@@ -123,19 +141,22 @@
 <style scoped lang="scss">
     @import "./../variables";
 
-    #step1 {
+    #step3 {
         text-align: center;
+        min-height: 75rem;
     }
 
     table {
-        margin: 0 auto;
-
-        tr {
-            padding: 0;
-
-            td {
-                padding: 1px;
-            }
+        text-align: left;
+        .ss_party_list_1,
+        .ss_zone,
+        .ss_allowed {
+            text-align: right;
+        }
+        td.ss_party_list_1,
+        td.ss_zone,
+        td.ss_allowed {
+            padding-right: 12px;
         }
     }
 </style>

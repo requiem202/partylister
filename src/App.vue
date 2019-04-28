@@ -63,4 +63,10 @@
         /*min-height: 75rem;*/
         padding-top: 7.5rem;
     }
+    .hide {
+        opacity: 0;
+    }
+    .number {
+        font-family: 'Roboto Mono', monospace;
+    }
 </style>

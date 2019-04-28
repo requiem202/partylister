@@ -4,18 +4,20 @@
             div.row
                 div.col-sm-12
                     div.text-center
-                        h1 คำนวณจำนวนเสียงต่อ ส.ส. พึงมี 1 คน
+                        h1 ขั้นที่ 1 คำนวณจำนวนเสียงต่อ ส.ส. พึงมี 1 คน
                         span.font-italic รัฐธรรมนูญ มาตรา 91 วรรค 1
-                        p รวมนับคะแนนทั้งประเทศ
-                            span.total-vote-count-number 0
-                        | เสียง
+                        p รวมนับคะแนนทั้งประเทศ!{' '}
+                            span.total-vote-count-number.number 0
+                            | เสียง
                         p.divide.hide ------------------------------------
-                        p.divide2.hide หารจำนวน ส.ส. ทั้งหมด 500 คน
+                        p.divide2.hide หารจำนวน ส.ส. ทั้งหมด!{' '}
+                            span.number 500
+                            |  คน
                         p.divide.hide เท่ากับ
                         h1
-                            span.total-vote-per-ss.hide 0
+                            span.total-vote-per-ss.hide.number  0
                         div
-                            Redo(@click="start", style="opacity: 0")
+                            Redo.hide(:click="start")
 </template>
 
 <script>
@@ -56,13 +58,13 @@
         .$anime
         .timeline({ autoplay: true })
         .add({
-          targets: '.total-vote-count-number',
+          targets: '#step1 .total-vote-count-number',
           color: '#56FF79',
           innerHTML: ['0', '35528749'],
           round: 1
         })
         .add({
-          targets: '.divide',
+          targets: '#step1 .divide',
           opacity: {
             value: 1,
             duration: 1000,
@@ -70,7 +72,7 @@
           }
         })
         .add({
-          targets: '.divide2',
+          targets: '#step1 .divide2',
           opacity: {
             value: 1,
             duration: 1000,
@@ -78,7 +80,7 @@
           }
         })
         .add({
-          targets: '.divide3',
+          targets: '#step1 .divide3',
           opacity: {
             value: 1,
             duration: 1000,
@@ -86,7 +88,7 @@
           }
         })
         .add({
-          targets: '.total-vote-per-ss',
+          targets: '#step1 .total-vote-per-ss',
           opacity: {
             value: 1,
             duration: 1000,
@@ -94,10 +96,14 @@
           }
         })
         .add({
-          targets: '.total-vote-per-ss',
+          targets: '#step1 .total-vote-per-ss',
           color: '#56FF79',
           innerHTML: ['0', '71057'],
           round: 1,
+        })
+        .add({
+          targets: '#step1 .btn',
+          opacity: 1
         })
     },
     methods: {
@@ -114,10 +120,10 @@
 
     #step1 {
         text-align: center;
+        /*min-height: 75rem;*/
+        min-height: 50rem;
     }
-    .hide {
-        opacity: 0;
-    }
+
     table {
         margin: 0 auto;
 
